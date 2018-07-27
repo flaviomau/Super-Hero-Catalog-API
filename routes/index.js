@@ -1,7 +1,7 @@
 const express     = require('express'),
       router      = express.Router()
 
-router.get('/', function (request, response) {
+router.get('/', (request, response) => {
   response.send('Super Hero Catalogue REST api')
 })
 

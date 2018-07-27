@@ -13,7 +13,7 @@ app.use(methodOverride('_method'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
-app.use(function (request, response, next) {
+app.use((request, response, next) => {
   if (request.url === '/favicon.ico') {
     response.writeHead(200, {'Content-Type': 'image/x-icon'})
     response.end('')
@@ -26,17 +26,17 @@ app.use(function (request, response, next) {
 app.use('/', routes)
 
 // error handling
-app.use(function(request, response, next) {
+app.use((request, response, next) => {
   var err = new Error('Not Found')
   err.status = 404
   next(err)
 })
 
-app.use(function(err, request, response, next) {
+app.use((err, request, response, next) => {
   response.status(err.status || 500).json({ err: err.message })
 })
 
-var server = app.listen(3000, function(){
+var server = app.listen(3000, () => {
   var host = server.address().address
   var port = server.address().port
   console.log('Super Hero Catalogue Server listening at http://%s:%s', host, port)

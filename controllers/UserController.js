@@ -42,7 +42,7 @@ UserController.prototype.readAll = function(request, response, next){
   }
 
   this.model.findAsync(pagination)
-    .then(function(data){
+    .then(data => {
       response.json(data)
     })
     .catch(next)
@@ -80,12 +80,12 @@ UserController.prototype.create = function(request, response, next){
 
 UserController.prototype.update = function(request, response, next){
   const _id = request.params._id
-  const user = buildUser(request.body)  
+  const user = buildUser(request.body)
 
   if(request.body.password){
-    bcrypt.genSalt(5, function(err, salt) {
+    bcrypt.genSalt(5, (err, salt) => {
       if (err) return next(err)
-      bcrypt.hash(request.body.password, salt, null, function(err, hash) {
+      bcrypt.hash(request.body.password, salt, null, (err, hash) => {
         if (err) return next(err)
         user['password'] = hash
       })
@@ -94,7 +94,7 @@ UserController.prototype.update = function(request, response, next){
 
 
   this.model.updateAsync(_id, user)
-    .then(function(data){
+    .then(data => {
       response.json(data)
     })
     .catch(error =>{
@@ -108,7 +108,7 @@ UserController.prototype.update = function(request, response, next){
 UserController.prototype.delete = function(request, response, next){
   const _id = request.params._id
   this.model.removeAsync(_id)
-    .then(function(data){
+    .then(data => {
       response.json(data)
     })
     .catch(next)
@@ -126,8 +126,8 @@ UserController.prototype.authenticate = function(request, response, next){
   const query = {username: username}
   this.model.findOneAsync(query)
     .then(handleNotFound)
-    .then(function(data){
-      bcrypt.compare(password, data.password, function(err, isMatch) {
+    .then(data => {
+      bcrypt.compare(password, data.password, (err, isMatch) => {
         if(isMatch){
           const expires = moment().add(7, 'days').valueOf()
           const token = jwt.encode({

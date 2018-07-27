@@ -28,7 +28,7 @@ SuperPowerController.prototype.readAll = function(request, response, next){
   }
 
   this.model.findAsync(pagination)
-    .then(function(data){
+    .then(data => {
       response.json(data)
     })
     .catch(next)
@@ -38,7 +38,7 @@ SuperPowerController.prototype.readById = function(request, response, next){
     const query = {_id: request.params._id}
     this.model.findOneAsync(query)
         .then(handleNotFound)
-        .then(function(data){
+        .then(data => {
             response.json(data)
         })
         .catch(next)
@@ -63,7 +63,7 @@ SuperPowerController.prototype.update = function(request, response, next){
   const superPower = buildSuperPower(request.body)
 
   this.model.updateAsync(_id, superPower)
-    .then(function(data){
+    .then(data => {
       response.json(data)
     })
     .catch(error =>{
@@ -78,7 +78,7 @@ SuperPowerController.prototype.delete = function(request, response, next){
   const _id = request.params._id
   //TODO: Check if the super power is registered for at least one super hero, in this case, return error
   this.model.removeAsync(_id)
-    .then(function(data){
+    .then(data => {
       response.json(data)
     })
     .catch(next)
