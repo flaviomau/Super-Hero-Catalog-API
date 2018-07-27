@@ -6,7 +6,7 @@ function SuperPowerDao(model){
 
 SuperPowerDao.prototype.create = function(data, callback){
   const model = new this.model(data)
-  model.save(function(err,result){
+  model.save((err,result) => {
     callback(err, result)
   })
 }
@@ -25,14 +25,14 @@ SuperPowerDao.prototype.findOne = function(query, callback){
 
 SuperPowerDao.prototype.update = function(_id, data, callback){
   const query = {_id: _id}
-  this.model.update(query, data).exec(function(err, result){
+  this.model.update(query, data).exec((err, result) => {
     callback(err, result)
   })
 }
 
 SuperPowerDao.prototype.delete = function(_id, callback){
   const query = {_id: _id}
-  this.model.remove(query).exec(function(err, result){
+  this.model.remove(query).exec((err, result) => {
     callback(err, result)
   })
 }

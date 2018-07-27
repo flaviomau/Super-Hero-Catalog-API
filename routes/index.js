@@ -7,5 +7,6 @@ router.get('/', (request, response) => {
 
 router.use('/users', require('./users'))
 router.use('/superpowers', require('./superPowers'))
+router.use('/superheroes', require('./superHeroes'))
 
 module.exports = router

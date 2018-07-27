@@ -37,7 +37,7 @@ module.exports = function(mongoose){
   const User = mongoose.model('User', {
     username:   { type: String, required: [true, 'Field username cannot be blank.'], unique: true},
     password:   { type: String, required: [true, 'Field password cannot be blank.']},
-    role:       { type: String, required: [true, 'Field role cannot be blank.']}
+    role:       { type: String, enum: ['Admin', 'Standard'], required: [true, 'Field role cannot be blank.']}
   })
   return new UserDao(User)
 }

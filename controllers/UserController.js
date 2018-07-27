@@ -16,7 +16,7 @@ const handleNotFound = (data) => {
 
 const buildUser = (body) => {
   return {
-      name: body.username,
+      username: body.username,
       role: body.role
   }
 }
