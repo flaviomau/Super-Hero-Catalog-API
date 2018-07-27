@@ -1,0 +1,10 @@
+{
+  "mongo": {
+    "username": "",
+    "password":"",
+    "server": "localhost",
+    "port": "27017",
+    "database": "super-hero-catalog"
+  },
+  "jwtTokenSecret" : "bt4M|WX^;^}srY2!W)OSMjR^YMryg*"
+}
