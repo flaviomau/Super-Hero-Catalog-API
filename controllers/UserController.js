@@ -1,17 +1,24 @@
-const debug     = require('debug')('smart-jirau:controller'),
+const debug     = require('debug')('super-hero-catalog:controller'),
       Promise   = require('bluebird'),
       jwt       = require('jwt-simple'),
       moment    = require('moment'),
       config    = require('config'),
       bcrypt    = require('bcrypt')
 
-const handleNotFound = function(data){
+const handleNotFound = (data) => {
   if(!data){
     const err = new Error('Not Found in database')
     err.status = 404
     throw err
   }
   return data
+}
+
+const buildUser = (body) => {
+  return {
+      name: body.username,
+      role: body.role
+  }
 }
 
 const getHash = async (password) => {
@@ -42,10 +49,7 @@ UserController.prototype.readAll = function(request, response, next){
 }
 
 UserController.prototype.create = function(request, response, next){
-  const user = {
-    'username': request.body.username,
-    'role': request.body.role
-  }
+  const user = buildUser(request.body)
 
   if (user.role !== 'Standard' && user.role !== 'Admin') {
     const err = new Error('Invalid role (must be Standard or Admin)')
@@ -76,10 +80,7 @@ UserController.prototype.create = function(request, response, next){
 
 UserController.prototype.update = function(request, response, next){
   const _id = request.params._id
-  const user = {
-    'username': request.body.username,
-    'usertype': request.body.usertype
-  }  
+  const user = buildUser(request.body)  
 
   if(request.body.password){
     bcrypt.genSalt(5, function(err, salt) {

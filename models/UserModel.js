@@ -19,10 +19,6 @@ UserDao.prototype.find = function(pagination, callback){
     .exec(callback)
 }
 
-UserDao.prototype.findOne = function(query, callback){
-  this.model.findOne(query).exec(callback)
-}
-
 UserDao.prototype.update = function(_id, data, callback){
   const query = {_id: _id}
   this.model.update(query, data).exec(function(err, result){

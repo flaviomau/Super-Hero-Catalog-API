@@ -6,5 +6,6 @@ router.get('/', function (request, response) {
 })
 
 router.use('/users', require('./users'))
+router.use('/superpowers', require('./superPowers'))
 
 module.exports = router
