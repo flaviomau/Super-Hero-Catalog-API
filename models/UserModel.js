@@ -1,0 +1,43 @@
+'use strict'
+
+function UserDao(model){
+  this.model = model
+}
+
+UserDao.prototype.create = function(data, callback){
+  const model = new this.model(data)
+  model.save(function(err,result){
+    callback(err, result)
+  })
+}
+
+UserDao.prototype.find = function(query, callback){
+  this.model.find(query).exec(callback)
+}
+
+UserDao.prototype.findOne = function(query, callback){
+  this.model.findOne(query).exec(callback)
+}
+
+UserDao.prototype.update = function(_id, data, callback){
+  const query = {_id: _id}
+  this.model.update(query, data).exec(function(err, result){
+    callback(err, result)
+  })
+}
+
+UserDao.prototype.delete = function(_id, callback){
+  const query = {_id: _id}
+  this.model.remove(query).exec(function(err, result){
+    callback(err, result)
+  })
+}
+
+module.exports = function(mongoose){
+  const User = mongoose.model('User', {
+    username:   { type: String, required: [true, 'Field username cannot be blank.'], unique: true},
+    password:   { type: String, required: [true, 'Field password cannot be blank.']},
+    role:       { type: String, required: [true, 'Field role cannot be blank.']}
+  })
+  return new UserDao(User)
+}

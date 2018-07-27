@@ -1,27 +1,27 @@
 var mongoose  = require('mongoose'),
     debug     = require('debug')('super-hero-catalog:mongoose'),
-    config    = require('config');
-'use strict';
+    config    = require('config')
+'use strict'
 function _connection(){
   var username  = config.get('mongo.username'),
       password  = config.get('mongo.password'),
       server    = config.get('mongo.server'),
       port      = config.get('mongo.port'),
       database  = config.get('mongo.database'),
-      auth      = username ? username + ':' + password + '@' : '';
-      return 'mongodb://' + auth + server + ':' + port + '/' + database;
-};
+      auth      = username ? username + ':' + password + '@' : ''
+      return 'mongodb://' + auth + server + ':' + port + '/' + database
+}
 
-mongoose.connect(_connection());
-var db = mongoose.connection;
+mongoose.connect(_connection())
+var db = mongoose.connection
 
 db.on('error', function(error){
   console.log('mongo error', error)
-  debug(error);
-});
+  debug(error)
+})
 
 db.once('open', function(callback){
-  debug('connected to mongodb');
-});
+  debug('connected to mongodb')
+})
 
-module.exports = mongoose;
+module.exports = mongoose

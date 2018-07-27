@@ -5,4 +5,6 @@ router.get('/', function (request, response) {
   response.send('Super Hero Catalogue REST api')
 })
 
-module.exports = router;
+router.use('/users', require('./users'))
+
+module.exports = router
