@@ -1,0 +1,26 @@
+{
+  "name": "super-hero-catalogue",
+  "version": "1.0.0",
+  "description": "Application to handle CRUD operations of super heroes, super powers, their protection area and the users that can access the system.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Flavio Andre da Silva",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "3.0.0",
+    "bluebird": "^3.4.6",
+    "body-parser": "^1.15.2",
+    "config": "^1.24.0",
+    "debug": "^3.1.0",
+    "express": "^4.14.0",
+    "jwt-simple": "^0.5.0",
+    "method-override": "^2.3.6",
+    "moment": "^2.16.0",
+    "mongoose": "^5.2.4",
+    "nodemon": "^1.18.3"
+  }
+}
