@@ -11,8 +11,12 @@ UserDao.prototype.create = function(data, callback){
   })
 }
 
-UserDao.prototype.find = function(query, callback){
-  this.model.find(query).exec(callback)
+UserDao.prototype.find = function(pagination, callback){
+  this.model
+    .find()
+    .skip(pagination.page * pagination.limit)
+    .limit(pagination.limit)
+    .exec(callback)
 }
 
 UserDao.prototype.findOne = function(query, callback){

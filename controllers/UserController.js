@@ -29,7 +29,12 @@ function UserController(UserModel){
 }
 
 UserController.prototype.readAll = function(request, response, next){
-  this.model.findAsync({})
+  const pagination = {
+    page: parseInt(request.query.page) || 0,
+    limit: parseInt(request.query.limit) || 10
+  }
+
+  this.model.findAsync(pagination)
     .then(function(data){
       response.json(data)
     })
