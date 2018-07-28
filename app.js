@@ -75,43 +75,6 @@ app.use((err, request, response, next) => {
 
 const server = require('http').createServer(app)  
 const io = require('./controllers/socketServer')(server)
-
-/*
-const server = require('http').createServer(app)  
-const io = require('socket.io')(server)
-
-io.on('connection', function(client) {  
-  client.on('subscribe', function(data) {
-    try{
-      const decoded = jwt.decode(token, config.get('jwtTokenSecret'))
-      const isExpired = moment(decoded.expires).isBefore(new Date())
-
-      if(!decoded.expires || !decoded.username || !decoded.role){
-        const message = 'Unauthorized (token malformed)'
-      }else if(isExpired){
-        const message = 'Unauthorized (token expired)'
-      }else{
-        decoded.username
-        decoded.role
-
-        if(decoded.role === 'Standard'){
-          const message = 'Unauthorized (low privilege)'
-        }else if(request.role === 'Admin'){
-          const message = 'ok'  
-        }else{
-            const message = 'Unauthorized (invalid role)'
-        }
-      }
-    }catch(err){
-      console.log(err)
-      const message = err
-    }
-      //client.disconnect(true)
-
-      client.emit('welcome', 'Welcome to Super Hero Catalogue Server Notification Socket - all messages will be sent in the audit event')
-  })
-})
-*/
 app.set('io', io)
 
 server.listen(3000, () => {
