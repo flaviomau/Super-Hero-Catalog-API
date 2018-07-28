@@ -10,6 +10,15 @@ const handleNotFound = (data) => {
   return data
 }
 
+const handleSuperPowerUsed = (data) => {
+  if(data.length > 0){
+    const err = new Error('Super power used by one Super hero and can not be deleted.')
+    err.status = 401
+    throw err
+  }
+  return data
+}
+
 const buildSuperPower = (body) => {
     return {
         name: body.name,
@@ -17,8 +26,9 @@ const buildSuperPower = (body) => {
     }
 }
 
-function SuperPowerController(SuperPowerModel){
+function SuperPowerController(SuperPowerModel, SuperHeroModel){
   this.model = Promise.promisifyAll(SuperPowerModel)
+  this.superHeroModel = Promise.promisifyAll(SuperHeroModel)
 }
 
 SuperPowerController.prototype.readAll = function(request, response, next){
@@ -74,14 +84,15 @@ SuperPowerController.prototype.update = function(request, response, next){
 
 SuperPowerController.prototype.delete = function(request, response, next){
   const _id = request.params._id
-  //TODO: Check if the super power is registered for at least one super hero, in this case, return error
-  this.model.removeAsync(_id)
-    .then(data => {
+  this.superHeroModel.findBySuperPowerAsync(_id)
+    .then(handleSuperPowerUsed)
+    .then(()=>{
+      return this.model.removeAsync(_id)      
+    }).then(data => {
       next(data)
-    })
-    .catch(next)
+    }).catch(next)
 }
 
-module.exports = function(SuperPowerModel){
-  return new SuperPowerController(SuperPowerModel)
+module.exports = function(SuperPowerModel, SuperHeroModel){
+  return new SuperPowerController(SuperPowerModel, SuperHeroModel)
 }

@@ -14,6 +14,7 @@ SuperHeroDao.prototype.create = function(data, callback){
 SuperHeroDao.prototype.find = function(pagination, callback){
   this.model
     .find()
+    .populate('superpower')
     .skip(pagination.page * pagination.limit)
     .limit(pagination.limit)
     .exec(callback)
@@ -23,6 +24,12 @@ SuperHeroDao.prototype.findOne = function(query, callback){
   this.model
     .findOne(query)
     .populate('superpower')
+    .exec(callback)
+}
+
+SuperHeroDao.prototype.findBySuperPower = function(superPower, callback){
+  this.model
+    .find({superpower: superPower})
     .exec(callback)
 }
 
