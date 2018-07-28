@@ -37,32 +37,32 @@ SuperHeroController.prototype.readAll = function(request, response, next){
 }
 
 SuperHeroController.prototype.readById = function(request, response, next){
-    const query = {_id: request.params._id}
-    this.model.findOneAsync(query)
-        .then(handleNotFound)
-        .then(data => {
-            response.json(data)
-        })
-        .catch(next)
+  const query = { _id: request.params._id }
+  this.model.findOneAsync(query)
+    .then(handleNotFound)
+    .then(data => {
+      next(data)
+    })
+    .catch(next)
 }
 
 SuperHeroController.prototype.create = function(request, response, next){
-    const superHero = buildSuperHero(request.body)
-    if(superHero.superpower.length === 0){
-      const err = new Error('The Super Hero must have at least one super power')
-      err.status = 401
-      return next(err)
-    }
-    this.model.createAsync(superHero)
-        .then(data => {
-            response.json(data)
-         })
-        .catch(error =>{
-            const messages = Object.keys(error.errors).map(key => {
-                return error.errors[key].message
-            })
-            response.json({errors: messages})
-        })  
+  const superHero = buildSuperHero(request.body)
+  if (superHero.superpower.length === 0) {
+    const err = new Error('The Super Hero must have at least one super power')
+    err.status = 401
+    return next(err)
+  }
+  this.model.createAsync(superHero)
+    .then(data => {
+      next(data)
+    })
+    .catch(error => {
+      const messages = Object.keys(error.errors).map(key => {
+        return error.errors[key].message
+      })
+      response.json({ errors: messages })
+    })  
 }
 
 SuperHeroController.prototype.update = function(request, response, next){
@@ -77,7 +77,7 @@ SuperHeroController.prototype.update = function(request, response, next){
 
   this.model.updateAsync(_id, superHero)
     .then(data => {
-      response.json(data)
+      next(data)
     })
     .catch(error =>{
       const messages = Object.keys(error.errors).map(key => {
@@ -89,10 +89,9 @@ SuperHeroController.prototype.update = function(request, response, next){
 
 SuperHeroController.prototype.delete = function(request, response, next){
   const _id = request.params._id
-  //TODO: Check if the super power is registered for at least one super hero, in this case, return error
   this.model.removeAsync(_id)
     .then(data => {
-      response.json(data)
+      next(data)
     })
     .catch(next)
 }

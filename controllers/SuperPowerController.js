@@ -35,27 +35,25 @@ SuperPowerController.prototype.readAll = function(request, response, next){
 }
 
 SuperPowerController.prototype.readById = function(request, response, next){
-    const query = {_id: request.params._id}
-    this.model.findOneAsync(query)
-        .then(handleNotFound)
-        .then(data => {
-            response.json(data)
-        })
-        .catch(next)
+  const query = {_id: request.params._id}
+  this.model.findOneAsync(query)
+    .then(handleNotFound)
+    .then(data => {
+      response.json(data)
+    }).catch(next)
 }
 
 SuperPowerController.prototype.create = function(request, response, next){
-    const superPower = buildSuperPower(request.body)
-    this.model.createAsync(superPower)
-        .then(data => {
-            response.json(data)
-         })
-        .catch(error =>{
-            const messages = Object.keys(error.errors).map(key => {
-                return error.errors[key].message
-            })
-            response.json({errors: messages})
-        })  
+  const superPower = buildSuperPower(request.body)
+  this.model.createAsync(superPower)
+    .then(data => {
+      next(data)
+    }).catch(error =>{
+      const messages = Object.keys(error.errors).map(key => {
+        return error.errors[key].message
+      })
+      response.json({errors: messages})
+    })  
 }
 
 SuperPowerController.prototype.update = function(request, response, next){
@@ -64,7 +62,7 @@ SuperPowerController.prototype.update = function(request, response, next){
 
   this.model.updateAsync(_id, superPower)
     .then(data => {
-      response.json(data)
+      next(data)
     })
     .catch(error =>{
       const messages = Object.keys(error.errors).map(key => {
@@ -79,7 +77,7 @@ SuperPowerController.prototype.delete = function(request, response, next){
   //TODO: Check if the super power is registered for at least one super hero, in this case, return error
   this.model.removeAsync(_id)
     .then(data => {
-      response.json(data)
+      next(data)
     })
     .catch(next)
 }
