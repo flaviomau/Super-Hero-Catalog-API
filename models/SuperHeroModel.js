@@ -33,7 +33,7 @@ SuperHeroDao.prototype.update = function(_id, data, callback){
   })
 }
 
-SuperHeroDao.prototype.delete = function(_id, callback){
+SuperHeroDao.prototype.remove = function(_id, callback){
   const query = {_id: _id}
   this.model.remove(query).exec((err, result) => {
     callback(err, result)

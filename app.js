@@ -39,28 +39,24 @@ app.use((request, response, next) => {
 app.use('/', routes)
 
 app.use((data, request, response, next) => {
+  console.log('here1', data)
   if(response.statusCode === 200){
-    if(request.method === 'PUT' || request.method === 'DELETE'){
-      const auditEvent = {
-        entity:   entities[request.url.split('/')[1]],
-        entityId: request.url.split('/')[2],
-        username: request.username,
-        action:   actions[request.method]
-      }
-      AuditEventModel.create(auditEvent)
-      response.json(data)
-    }else if(request.method === 'POST'){
-      const auditEvent = {
-        entity:   entities[request.url.split('/')[1]],
-        entityId: data._id,
-        username: request.username,
-        action:   actions[request.method]
-      }
-      AuditEventModel.create(auditEvent)
-      response.json(data)
-    }else{
-      response.json(data)
+    const auditEvent = {
+      entity:   entities[request.url.split('/')[1]],
+      username: request.username,
+      action:   actions[request.method]
     }
+
+    if(request.method === 'GET')
+      response.json(data)
+    else if(request.method === 'PUT' || request.method === 'DELETE'){
+      auditEvent['entityId'] = request.url.split('/')[2]      
+    }else if(request.method === 'POST'){
+      auditEvent['entityId'] = data._id
+    }
+
+    AuditEventModel.create(auditEvent)
+    response.json(data)
   }else{
     next()
   }  
@@ -68,6 +64,7 @@ app.use((data, request, response, next) => {
 
 // error handling
 app.use((request, response, next) => {
+  console.log('here2')
   var err = new Error('Not Found')
   err.status = 404
   next(err)

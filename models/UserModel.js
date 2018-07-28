@@ -26,7 +26,7 @@ UserDao.prototype.update = function(_id, data, callback){
   })
 }
 
-UserDao.prototype.delete = function(_id, callback){
+UserDao.prototype.remove = function(_id, callback){
   const query = {_id: _id}
   this.model.remove(query).exec((err, result) => {
     callback(err, result)
