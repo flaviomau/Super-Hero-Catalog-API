@@ -41,7 +41,7 @@ SuperHeroController.prototype.readById = function(request, response, next){
   this.model.findOneAsync(query)
     .then(handleNotFound)
     .then(data => {
-      next(data)
+      return next(data)
     })
     .catch(next)
 }
@@ -55,7 +55,7 @@ SuperHeroController.prototype.create = function(request, response, next){
   }
   this.model.createAsync(superHero)
     .then(data => {
-      next(data)
+      return next(data)
     })
     .catch(error => {
       const messages = Object.keys(error.errors).map(key => {
@@ -77,7 +77,7 @@ SuperHeroController.prototype.update = function(request, response, next){
 
   this.model.updateAsync(_id, superHero)
     .then(data => {
-      next(data)
+      return next(data)
     })
     .catch(error =>{
       const messages = Object.keys(error.errors).map(key => {
@@ -91,7 +91,7 @@ SuperHeroController.prototype.delete = function(request, response, next){
   const _id = request.params._id
   this.model.removeAsync(_id)
     .then(data => {
-      next(data)
+      return next(data)
     })
     .catch(next)
 }

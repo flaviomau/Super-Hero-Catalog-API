@@ -37,29 +37,28 @@ app.use((request, response, next) => {
 app.use('/', routes)
 
 app.use((data, request, response, next) => {
-  if(response.statusCode === 200){
-    const auditEvent = {
-      entity:   entities[request.url.split('/')[1]],
-      username: request.username,
-      action:   actions[request.method]
-    }
+  if(data.status)
+    return next(data)
+  
+  const auditEvent = {
+    entity:   entities[request.url.split('/')[1]],
+    username: request.username,
+    action:   actions[request.method]
+  }
 
-    if(request.method === 'GET')
-      response.json(data)
-    else {      
-      const io = request.app.get('io');
-      if(request.method === 'PUT' || request.method === 'DELETE'){
-        auditEvent['entityId'] = request.url.split('/')[2]      
-      }else if(request.method === 'POST'){
-        auditEvent['entityId'] = data._id
-      }
-      AuditEventModel.create(auditEvent)      
-      io.emit('audit', auditEvent);
-      response.json(data)
+  if(request.method === 'GET')
+    response.json(data)
+  else {      
+    const io = request.app.get('io');
+    if(request.method === 'PUT' || request.method === 'DELETE'){
+      auditEvent['entityId'] = request.url.split('/')[2]      
+    }else if(request.method === 'POST'){
+      auditEvent['entityId'] = data._id
     }
-  }else{
-    next(data)
-  }  
+    AuditEventModel.create(auditEvent)      
+    io.emit('audit', auditEvent);
+    response.json(data)
+  }
 })
 
 // error handling

@@ -65,7 +65,7 @@ UserController.prototype.create = function(request, response, next){
     }).then(()=>{
       return this.model.createAsync(user)
     }).then(data => {
-      next(data)
+      return next(data)
     }).catch(error =>{
       if(error.errors){
         const messages = Object.keys(error.errors).map(key => {
@@ -94,7 +94,7 @@ UserController.prototype.update = function(request, response, next){
 
   this.model.updateAsync(_id, user)
     .then(data => {
-      next(data)
+      return next(data)
     })
     .catch(error =>{
       const messages = Object.keys(error.errors).map(key => {
@@ -108,7 +108,7 @@ UserController.prototype.delete = function(request, response, next){
   const _id = request.params._id
   this.model.removeAsync(_id)
     .then(data => {
-      next(data)
+      return next(data)
     })
     .catch(next)
 }

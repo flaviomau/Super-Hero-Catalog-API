@@ -57,7 +57,7 @@ SuperPowerController.prototype.create = function(request, response, next){
   const superPower = buildSuperPower(request.body)
   this.model.createAsync(superPower)
     .then(data => {
-      next(data)
+      return next(data)
     }).catch(error =>{
       const messages = Object.keys(error.errors).map(key => {
         return error.errors[key].message
@@ -72,7 +72,7 @@ SuperPowerController.prototype.update = function(request, response, next){
 
   this.model.updateAsync(_id, superPower)
     .then(data => {
-      next(data)
+      return next(data)
     })
     .catch(error =>{
       const messages = Object.keys(error.errors).map(key => {
@@ -86,10 +86,10 @@ SuperPowerController.prototype.delete = function(request, response, next){
   const _id = request.params._id
   this.superHeroModel.findBySuperPowerAsync(_id)
     .then(handleSuperPowerUsed)
-    .then(()=>{
-      return this.model.removeAsync(_id)      
-    }).then(data => {
-      next(data)
+    .then(()=>{    
+      return this.model.removeAsync(_id)
+    }).then(data => {      
+      return next(data)
     }).catch(next)
 }
 
