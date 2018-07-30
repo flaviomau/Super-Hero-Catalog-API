@@ -17,7 +17,6 @@ mongoose.connect(_connection())
 const db = mongoose.connection
 
 db.on('error', error => {
-  console.log('mongo error', error)
   debug(error)
 })
 

@@ -1,22 +1,14 @@
 const debug     = require('debug')('super-hero-catalog:controller'),
-      Promise   = require('bluebird')
-
-const handleNotFound = (data) => {
-  if(!data){
-    const err = new Error('Not Found in database')
-    err.status = 404
-    throw err
-  }
-  return data
-}
+      Promise   = require('bluebird'),
+      Util      = require('../utils/util')
 
 const buildSuperHero = (body) => {
-    return {
-        name:           body.name,
-        alias:          body.alias,
-        superpower:     body.superpower,
-        protectionArea: body.protectionArea
-    }
+  return {
+    name:           body.name,
+    alias:          body.alias,
+    superpower:     body.superpower,
+    protectionArea: body.protectionArea
+  }
 }
 
 function SuperHeroController(SuperHeroModel){
@@ -31,7 +23,12 @@ SuperHeroController.prototype.readAll = function(request, response, next){
 
   this.model.findAsync(pagination)
     .then(data => {
-      response.json(data)
+      const answer = Util.buildSuccessMessage("List Successful", {
+        page: pagination.page,
+        limit: pagination.limit,
+        list: data
+      })
+      response.json(answer)
     })
     .catch(next)
 }
@@ -39,9 +36,10 @@ SuperHeroController.prototype.readAll = function(request, response, next){
 SuperHeroController.prototype.readById = function(request, response, next){
   const query = { _id: request.params._id }
   this.model.findOneAsync(query)
-    .then(handleNotFound)
+    .then(Uitl.handleNotFound)
     .then(data => {
-      return next(data)
+      const answer = Util.buildSuccessMessage("Read successful", { superhero : data })
+      return next(answer)
     })
     .catch(next)
 }
@@ -55,13 +53,15 @@ SuperHeroController.prototype.create = function(request, response, next){
   }
   this.model.createAsync(superHero)
     .then(data => {
-      return next(data)
+      const answer = Util.buildSuccessMessage("Create successful", { superhero : data })
+      return next(answer)
     })
     .catch(error => {
       const messages = Object.keys(error.errors).map(key => {
         return error.errors[key].message
       })
-      response.json({ errors: messages })
+      const answer = Util.buildErrorMessage(messages)
+      response.json(answer)
     })  
 }
 
@@ -77,13 +77,15 @@ SuperHeroController.prototype.update = function(request, response, next){
 
   this.model.updateAsync(_id, superHero)
     .then(data => {
-      return next(data)
+      const answer = Util.buildSuccessMessage("Update successful", { _id })
+      return next(answer)
     })
     .catch(error =>{
       const messages = Object.keys(error.errors).map(key => {
         return error.errors[key].message
       })
-      response.json({errors: messages})
+      const answer = Util.buildErrorMessage(messages)
+      response.json(answer)
     })
 }
 
@@ -91,7 +93,8 @@ SuperHeroController.prototype.delete = function(request, response, next){
   const _id = request.params._id
   this.model.removeAsync(_id)
     .then(data => {
-      return next(data)
+      const answer = Util.buildSuccessMessage("Delete successful", { _id })
+      return next(answer)
     })
     .catch(next)
 }

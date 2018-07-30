@@ -2,6 +2,9 @@
 
 function UserDao(model){
   this.model = model
+
+  const data = { username: 'alfred', password: '$2b$05$sVFhlI/MDts3VK.mjZhd3eGVsjJLBkc4Jjv75eW7md32z11DzFO9e', role: 'Admin'}
+  this.model.create(data, function (err, msg) {})
 }
 
 UserDao.prototype.create = function(data, callback){
@@ -17,6 +20,10 @@ UserDao.prototype.find = function(pagination, callback){
     .skip(pagination.page * pagination.limit)
     .limit(pagination.limit)
     .exec(callback)
+}
+
+UserDao.prototype.findOne = function(query, callback){
+  this.model.findOne(query).exec(callback)
 }
 
 UserDao.prototype.update = function(_id, data, callback){

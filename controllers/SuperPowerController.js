@@ -1,14 +1,6 @@
 const debug     = require('debug')('super-hero-catalog:controller'),
-      Promise   = require('bluebird')
-
-const handleNotFound = (data) => {
-  if(!data){
-    const err = new Error('Not Found in database')
-    err.status = 404
-    throw err
-  }
-  return data
-}
+      Promise   = require('bluebird'),
+      Util      = require('../utils/util')
 
 const handleSuperPowerUsed = (data) => {
   if(data.length > 0){
@@ -39,7 +31,12 @@ SuperPowerController.prototype.readAll = function(request, response, next){
 
   this.model.findAsync(pagination)
     .then(data => {
-      response.json(data)
+      const answer = Util.buildSuccessMessage("List Successful", {
+        page: pagination.page,
+        limit: pagination.limit,
+        list: data
+      })
+      response.json(answer)
     })
     .catch(next)
 }
@@ -47,9 +44,12 @@ SuperPowerController.prototype.readAll = function(request, response, next){
 SuperPowerController.prototype.readById = function(request, response, next){
   const query = {_id: request.params._id}
   this.model.findOneAsync(query)
-    .then(handleNotFound)
+    .then(Util.handleNotFound)
     .then(data => {
-      response.json(data)
+      const answer = Util.buildSuccessMessage("Read Successful", {        
+        superPower: data
+      })
+      response.json(answer)
     }).catch(next)
 }
 
@@ -57,12 +57,14 @@ SuperPowerController.prototype.create = function(request, response, next){
   const superPower = buildSuperPower(request.body)
   this.model.createAsync(superPower)
     .then(data => {
-      return next(data)
+      const answer = Util.buildSuccessMessage("Create successful", { superpower : data })
+      return next(answer)
     }).catch(error =>{
       const messages = Object.keys(error.errors).map(key => {
         return error.errors[key].message
       })
-      response.json({errors: messages})
+      const answer = Util.buildErrorMessage(messages)
+      response.json(answer)
     })  
 }
 
@@ -72,13 +74,15 @@ SuperPowerController.prototype.update = function(request, response, next){
 
   this.model.updateAsync(_id, superPower)
     .then(data => {
-      return next(data)
+      const answer = Util.buildSuccessMessage("Update successful", { _id })
+      return next(answer)
     })
     .catch(error =>{
       const messages = Object.keys(error.errors).map(key => {
         return error.errors[key].message
       })
-      response.json({errors: messages})
+      const answer = Util.buildErrorMessage(messages)
+      response.json(answer)      
     })
 }
 
@@ -88,8 +92,9 @@ SuperPowerController.prototype.delete = function(request, response, next){
     .then(handleSuperPowerUsed)
     .then(()=>{    
       return this.model.removeAsync(_id)
-    }).then(data => {      
-      return next(data)
+    }).then(data => {
+      const answer = Util.buildSuccessMessage("Delete successful", { _id })
+      return next(answer)
     }).catch(next)
 }
 

@@ -27,7 +27,7 @@ module.exports = (option) => {
         return next(err)
       }else if(isExpired){
         const err = new Error('Unauthorized (token expired)')
-        err.status = 401
+        err.status = 401        
         return next(err)
       }else{
         request.username = decoded.username
@@ -53,7 +53,9 @@ module.exports = (option) => {
         }
         next()
       }
-    }catch(err){
+    }catch(error){
+      const err = new Error(error)
+      err.status = 401
       return next(err)
     }
   }

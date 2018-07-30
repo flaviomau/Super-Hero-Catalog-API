@@ -3,16 +3,8 @@ const debug     = require('debug')('super-hero-catalog:controller'),
       jwt       = require('jwt-simple'),
       moment    = require('moment'),
       config    = require('config'),
-      bcrypt    = require('bcrypt')
-
-const handleNotFound = (data) => {
-  if(!data){
-    const err = new Error('Not Found in database')
-    err.status = 404
-    throw err
-  }
-  return data
-}
+      bcrypt    = require('bcrypt'),
+      Util      = require('../utils/util')
 
 const buildUser = (body) => {
   return {
@@ -43,7 +35,12 @@ UserController.prototype.readAll = function(request, response, next){
 
   this.model.findAsync(pagination)
     .then(data => {
-      response.json(data)
+      const answer = Util.buildSuccessMessage("List Successful", {
+        page: pagination.page,
+        limit: pagination.limit,
+        list: data
+      })
+      response.json(answer)
     })
     .catch(next)
 }
@@ -65,13 +62,15 @@ UserController.prototype.create = function(request, response, next){
     }).then(()=>{
       return this.model.createAsync(user)
     }).then(data => {
-      return next(data)
+      const answer = Util.buildSuccessMessage("Create successful", { user : data })
+      return next(answer)
     }).catch(error =>{
       if(error.errors){
         const messages = Object.keys(error.errors).map(key => {
           return error.errors[key].message
         })
-        response.json({errors: messages})
+        const answer = Util.buildErrorMessage(messages)
+        response.json(answer)
       }else{
         next(error) 
       }
@@ -94,13 +93,15 @@ UserController.prototype.update = function(request, response, next){
 
   this.model.updateAsync(_id, user)
     .then(data => {
-      return next(data)
+      const answer = Util.buildSuccessMessage("Update successful", { _id })
+      return next(answer)
     })
     .catch(error =>{
       const messages = Object.keys(error.errors).map(key => {
         return error.errors[key].message
       })
-      response.json({errors: messages})
+      const answer = Util.buildErrorMessage(messages)
+      response.json(answer)
     })
 }
 
@@ -108,7 +109,8 @@ UserController.prototype.delete = function(request, response, next){
   const _id = request.params._id
   this.model.removeAsync(_id)
     .then(data => {
-      return next(data)
+      const answer = Util.buildSuccessMessage("Delete successful", { superhero : data })
+      return next(answer)
     })
     .catch(next)
 }
@@ -117,6 +119,7 @@ UserController.prototype.authenticate = function(request, response, next){
   const username = request.body.username || ''
   const password = request.body.password || ''
   const role = request.body.role || ''
+
   if (username == '' || password == '') {
     const err = new Error('Unauthorized (missing username or password)')
     err.status = 401
@@ -124,7 +127,7 @@ UserController.prototype.authenticate = function(request, response, next){
   }
   const query = {username: username}
   this.model.findOneAsync(query)
-    .then(handleNotFound)
+    .then(Util.handleNotFound)
     .then(data => {
       bcrypt.compare(password, data.password, (err, isMatch) => {
         if(isMatch){
@@ -136,7 +139,8 @@ UserController.prototype.authenticate = function(request, response, next){
             }, 
             config.get('jwtTokenSecret')
           )
-          response.json({token: token})
+          const answer = Util.buildSuccessMessage("Authentication successful", {token: token})
+          response.json(answer)
         }else{
           const err = new Error('Invalid Password')
           err.status = 401
@@ -144,7 +148,7 @@ UserController.prototype.authenticate = function(request, response, next){
         }
       })
     })
-  .catch(next)
+    .catch(next)
 }
 
 module.exports = function(UserModel){

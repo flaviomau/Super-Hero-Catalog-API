@@ -3,8 +3,9 @@ const express               = require('express'),
       bodyParser            = require('body-parser'),
       routes                = require('./routes'),
       mongoose              = require('./db/mongoose'),
-      AuditEventModel       = require('./models/AuditEventModel')(mongoose)
-      app                   = express(),  
+      AuditEventModel       = require('./models/AuditEventModel')(mongoose),
+      Util                  = require('./utils/util'),
+      app                   = express(),       
       entities              = {
         'superheroes' : 'SuperHero',
         'superpowers' : 'SuperPower',
@@ -39,23 +40,25 @@ app.use('/', routes)
 app.use((data, request, response, next) => {
   if(data.status)
     return next(data)
-  
+  else
+    console.log('AUDIT DATA', data)
+
   const auditEvent = {
     entity:   entities[request.url.split('/')[1]],
     username: request.username,
     action:   actions[request.method]
   }
 
-  if(request.method === 'GET')
+  if(request.method === 'GET' || (request.url.split('/')[2] && request.url.split('/')[2] == 'authenticate'))
     response.json(data)
   else {      
     const io = request.app.get('io');
     if(request.method === 'PUT' || request.method === 'DELETE'){
-      auditEvent['entityId'] = request.url.split('/')[2]      
+      auditEvent['entityId'] = request.url.split('/')[2]
     }else if(request.method === 'POST'){
       auditEvent['entityId'] = data._id
     }
-    AuditEventModel.create(auditEvent)      
+    AuditEventModel.create(auditEvent)
     io.emit('audit', auditEvent);
     response.json(data)
   }
@@ -69,7 +72,8 @@ app.use((request, response, next) => {
 })
 
 app.use((err, request, response, next) => {
-  response.status(err.status || 500).json({ err: err.message })
+  const answer = Util.buildErrorMessage(err.message)
+  response.status(err.status || 500).json(answer)
 })
 
 const server = require('http').createServer(app)  
