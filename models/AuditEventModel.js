@@ -15,7 +15,7 @@ module.exports = function(mongoose){
     username:   { type: String, required: [true, 'Field username cannot be blank.']},
     action:     { type: String, required: [true, 'Field action cannot be blank.']},
     entityId:   { type: mongoose.Schema.Types.ObjectId, required: [true, 'Field name cannot be blank.']},
-    datetime:   { type: Date,   default: Date.now }
+    datetime:   { type: String, required: [true, 'Field datetime cannot be blank.'] }
   })
   return new AuditEventDao(AuditEvent)
 }

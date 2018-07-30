@@ -62,7 +62,7 @@ UserController.prototype.create = function(request, response, next){
     }).then(()=>{
       return this.model.createAsync(user)
     }).then(data => {
-      const answer = Util.buildSuccessMessage("Create successful", { user : data })
+      const answer = Util.buildSuccessMessage("Create successful", { users : data })
       return next(answer)
     }).catch(error =>{
       if(error.errors){
@@ -72,7 +72,9 @@ UserController.prototype.create = function(request, response, next){
         const answer = Util.buildErrorMessage(messages)
         response.json(answer)
       }else{
-        next(error) 
+        const err = new Error(error.message || error)
+        err.status = 401
+        next(err)
       }
     })  
 }
@@ -97,11 +99,17 @@ UserController.prototype.update = function(request, response, next){
       return next(answer)
     })
     .catch(error =>{
-      const messages = Object.keys(error.errors).map(key => {
-        return error.errors[key].message
-      })
-      const answer = Util.buildErrorMessage(messages)
-      response.json(answer)
+      if(error.errors){
+        const messages = Object.keys(error.errors).map(key => {
+          return error.errors[key].message
+        })
+        const answer = Util.buildErrorMessage(messages)
+        response.json(answer)
+      }else{
+        const err = new Error(error.message || error)
+        err.status = 401
+        next(err)
+      }
     })
 }
 
@@ -109,7 +117,7 @@ UserController.prototype.delete = function(request, response, next){
   const _id = request.params._id
   this.model.removeAsync(_id)
     .then(data => {
-      const answer = Util.buildSuccessMessage("Delete successful", { superhero : data })
+      const answer = Util.buildSuccessMessage("Delete successful", { users : data })
       return next(answer)
     })
     .catch(next)

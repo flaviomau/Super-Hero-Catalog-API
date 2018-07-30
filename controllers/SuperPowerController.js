@@ -47,7 +47,7 @@ SuperPowerController.prototype.readById = function(request, response, next){
     .then(Util.handleNotFound)
     .then(data => {
       const answer = Util.buildSuccessMessage("Read Successful", {        
-        superPower: data
+        superpowers: data
       })
       response.json(answer)
     }).catch(next)
@@ -57,14 +57,20 @@ SuperPowerController.prototype.create = function(request, response, next){
   const superPower = buildSuperPower(request.body)
   this.model.createAsync(superPower)
     .then(data => {
-      const answer = Util.buildSuccessMessage("Create successful", { superpower : data })
+      const answer = Util.buildSuccessMessage("Create successful", { superpowers : data })
       return next(answer)
-    }).catch(error =>{
-      const messages = Object.keys(error.errors).map(key => {
-        return error.errors[key].message
-      })
-      const answer = Util.buildErrorMessage(messages)
-      response.json(answer)
+    }).catch(error =>{            
+      if(error.errors){
+        const messages = Object.keys(error.errors).map(key => {
+          return error.errors[key].message
+        })
+        const answer = Util.buildErrorMessage(messages)
+        response.json(answer)
+      }else{
+        const err = new Error(error.message || error)
+        err.status = 401
+        next(err)
+      }
     })  
 }
 
@@ -78,11 +84,17 @@ SuperPowerController.prototype.update = function(request, response, next){
       return next(answer)
     })
     .catch(error =>{
-      const messages = Object.keys(error.errors).map(key => {
-        return error.errors[key].message
-      })
-      const answer = Util.buildErrorMessage(messages)
-      response.json(answer)      
+      if(error.errors){
+        const messages = Object.keys(error.errors).map(key => {
+          return error.errors[key].message
+        })
+        const answer = Util.buildErrorMessage(messages)
+        response.json(answer)
+      }else{
+        const err = new Error(error.message || error)
+        err.status = 401
+        next(err)
+      }
     })
 }
 

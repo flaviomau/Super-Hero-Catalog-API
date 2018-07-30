@@ -40,11 +40,10 @@ app.use('/', routes)
 app.use((data, request, response, next) => {
   if(data.status)
     return next(data)
-  else
-    console.log('AUDIT DATA', data)
 
+  const entity = request.url.split('/')[1]
   const auditEvent = {
-    entity:   entities[request.url.split('/')[1]],
+    entity:   entities[entity],
     username: request.username,
     action:   actions[request.method]
   }
@@ -56,8 +55,9 @@ app.use((data, request, response, next) => {
     if(request.method === 'PUT' || request.method === 'DELETE'){
       auditEvent['entityId'] = request.url.split('/')[2]
     }else if(request.method === 'POST'){
-      auditEvent['entityId'] = data._id
+      auditEvent['entityId'] = data.data[entity]._id
     }
+    auditEvent.datetime = new Date().getTime()
     AuditEventModel.create(auditEvent)
     io.emit('audit', auditEvent);
     response.json(data)

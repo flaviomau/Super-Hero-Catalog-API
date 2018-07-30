@@ -38,7 +38,7 @@ SuperHeroController.prototype.readById = function(request, response, next){
   this.model.findOneAsync(query)
     .then(Uitl.handleNotFound)
     .then(data => {
-      const answer = Util.buildSuccessMessage("Read successful", { superhero : data })
+      const answer = Util.buildSuccessMessage("Read successful", { superheroes : data })
       return next(answer)
     })
     .catch(next)
@@ -53,15 +53,21 @@ SuperHeroController.prototype.create = function(request, response, next){
   }
   this.model.createAsync(superHero)
     .then(data => {
-      const answer = Util.buildSuccessMessage("Create successful", { superhero : data })
+      const answer = Util.buildSuccessMessage("Create successful", { superheroes : data })
       return next(answer)
     })
     .catch(error => {
-      const messages = Object.keys(error.errors).map(key => {
-        return error.errors[key].message
-      })
-      const answer = Util.buildErrorMessage(messages)
-      response.json(answer)
+      if(error.errors){
+        const messages = Object.keys(error.errors).map(key => {
+          return error.errors[key].message
+        })
+        const answer = Util.buildErrorMessage(messages)
+        response.json(answer)
+      }else{
+        const err = new Error(error.message || error)
+        err.status = 401
+        next(err)
+      }
     })  
 }
 
@@ -81,11 +87,17 @@ SuperHeroController.prototype.update = function(request, response, next){
       return next(answer)
     })
     .catch(error =>{
-      const messages = Object.keys(error.errors).map(key => {
-        return error.errors[key].message
-      })
-      const answer = Util.buildErrorMessage(messages)
-      response.json(answer)
+      if(error.errors){
+        const messages = Object.keys(error.errors).map(key => {
+          return error.errors[key].message
+        })
+        const answer = Util.buildErrorMessage(messages)
+        response.json(answer)
+      }else{
+        const err = new Error(error.message || error)
+        err.status = 401
+        next(err)
+      }
     })
 }
 
