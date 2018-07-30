@@ -51,7 +51,7 @@ app.use((data, request, response, next) => {
   if(request.method === 'GET' || (request.url.split('/')[2] && request.url.split('/')[2] == 'authenticate'))
     response.json(data)
   else {      
-    const io = request.app.get('io');
+    const io = request.app.get('io')
     if(request.method === 'PUT' || request.method === 'DELETE'){
       auditEvent['entityId'] = request.url.split('/')[2]
     }else if(request.method === 'POST'){
@@ -59,7 +59,7 @@ app.use((data, request, response, next) => {
     }
     auditEvent.datetime = new Date().getTime()
     AuditEventModel.create(auditEvent)
-    io.emit('audit', auditEvent);
+    io.emit('audit', auditEvent)
     response.json(data)
   }
 })
@@ -84,4 +84,6 @@ server.listen(3000, () => {
   var host = server.address().address
   var port = server.address().port
   console.log('Super Hero Catalogue Server listening at http://%s:%s', host, port)
-});
+})
+
+module.exports = server
