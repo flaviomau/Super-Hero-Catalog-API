@@ -1,12 +1,14 @@
 {
   "name": "super-hero-catalogue",
   "version": "1.0.0",
-  "description": "Application to handle CRUD operations of super heroes, super powers, their protection area and the users that can access the system.",
+  "description": "Application to handle CRUD operations of superheroes, superpowers, their protection area and the users that can access the system.",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "test": "nyc mocha"
+    "test": "mocha --timeout 10000",
+    "test-coverage": "nyc mocha",
+    "documentation": "./node_modules/.bin/jsdoc routes/users.js routes/superPowers.js routes/superHeroes.js"
   },
   "author": "Flavio Andre da Silva",
   "license": "ISC",

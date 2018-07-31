@@ -47,7 +47,7 @@ SuperHeroController.prototype.readById = function(request, response, next){
 SuperHeroController.prototype.create = function(request, response, next){
   const superHero = buildSuperHero(request.body)
   if (superHero.superpower.length === 0) {
-    const err = new Error('The Super Hero must have at least one super power')
+    const err = new Error('The Super Hero must have at least one superpower')
     err.status = 401
     return next(err)
   }
@@ -76,7 +76,7 @@ SuperHeroController.prototype.update = function(request, response, next){
   const superHero = buildSuperHero(request.body)
 
   if(superHero.superpower.length === 0){
-    const err = new Error('The Super Hero must have at least one super power')
+    const err = new Error('The Super Hero must have at least one superpower')
     err.status = 401
     return next(err)
   }

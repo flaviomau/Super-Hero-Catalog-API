@@ -4,7 +4,7 @@ const debug     = require('debug')('super-hero-catalog:controller'),
 
 const handleSuperPowerUsed = (data) => {
   if(data.length > 0){
-    const err = new Error('Super power used by one Super hero and can not be deleted.')
+    const err = new Error('SuperPower used by one SuperHero and can not be deleted.')
     err.status = 401
     throw err
   }

@@ -1,8 +1,8 @@
 exports.buildSuccessMessage = (message, data) => {
   return {
     success: true,
-      message: message || "",
-      data: data || ""
+    message: message || "",
+    data: data || ""
   }
 }
 
