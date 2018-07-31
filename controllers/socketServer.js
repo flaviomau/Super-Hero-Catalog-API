@@ -22,14 +22,14 @@ module.exports = (server) => {
 						client.emit('welcome', 'Unauthorized (low privilege)')
 						client.disconnect(true)
         	}else if(decoded.role === 'Admin'){
-						client.emit('welcome', 'Welcome to Super Hero Catalogue Server Notification Socket - all messages will be sent in the audit event')
+						client.emit('welcome', 'Welcome to Super Hero Catalogue Server Notification Socket - all messages will be sent in the audit event.')
         	}else{
 						client.emit('welcome', 'Unauthorized (invalid role)')
 						client.disconnect(true)
         	}
      	 	}
     	}catch(err){
-				client.emit('welcome', 'Authorizathion toke not sent or invalid.')
+				client.emit('welcome', 'Authorizathion token not sent or invalid.')
 				client.disconnect(true)
     	}		      
 		})

@@ -23,7 +23,7 @@ SuperHeroController.prototype.readAll = function(request, response, next){
 
   this.model.findAsync(pagination)
     .then(data => {
-      const answer = Util.buildSuccessMessage("List Successful", {
+      const answer = Util.buildSuccessMessage("List successful", {
         page: pagination.page,
         limit: pagination.limit,
         list: data
@@ -36,7 +36,7 @@ SuperHeroController.prototype.readAll = function(request, response, next){
 SuperHeroController.prototype.readById = function(request, response, next){
   const query = { _id: request.params._id }
   this.model.findOneAsync(query)
-    .then(Uitl.handleNotFound)
+    .then(Util.handleNotFound)
     .then(data => {
       const answer = Util.buildSuccessMessage("Read successful", { superheroes : data })
       return next(answer)

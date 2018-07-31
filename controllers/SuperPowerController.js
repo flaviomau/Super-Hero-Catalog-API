@@ -31,7 +31,7 @@ SuperPowerController.prototype.readAll = function(request, response, next){
 
   this.model.findAsync(pagination)
     .then(data => {
-      const answer = Util.buildSuccessMessage("List Successful", {
+      const answer = Util.buildSuccessMessage("List successful", {
         page: pagination.page,
         limit: pagination.limit,
         list: data
@@ -46,7 +46,7 @@ SuperPowerController.prototype.readById = function(request, response, next){
   this.model.findOneAsync(query)
     .then(Util.handleNotFound)
     .then(data => {
-      const answer = Util.buildSuccessMessage("Read Successful", {        
+      const answer = Util.buildSuccessMessage("Read successful", {
         superpowers: data
       })
       response.json(answer)

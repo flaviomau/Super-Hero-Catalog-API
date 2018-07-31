@@ -3,8 +3,10 @@
 function UserDao(model){
   this.model = model
 
-  const data = { username: 'alfred', password: '$2b$05$sVFhlI/MDts3VK.mjZhd3eGVsjJLBkc4Jjv75eW7md32z11DzFO9e', role: 'Admin'}
-  this.model.create(data, function (err, msg) {})
+  const admin = { username: 'alfred', password: '$2b$05$sVFhlI/MDts3VK.mjZhd3eGVsjJLBkc4Jjv75eW7md32z11DzFO9e', role: 'Admin'}
+  const standard = { username: 'robin', password: '$2b$05$sVFhlI/MDts3VK.mjZhd3eGVsjJLBkc4Jjv75eW7md32z11DzFO9e', role: 'Standard'}
+  this.model.create(admin, function (err, msg) {})
+  this.model.create(standard, function (err, msg) {})
 }
 
 UserDao.prototype.create = function(data, callback){

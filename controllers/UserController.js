@@ -35,7 +35,7 @@ UserController.prototype.readAll = function(request, response, next){
 
   this.model.findAsync(pagination)
     .then(data => {
-      const answer = Util.buildSuccessMessage("List Successful", {
+      const answer = Util.buildSuccessMessage("List successful", {
         page: pagination.page,
         limit: pagination.limit,
         list: data

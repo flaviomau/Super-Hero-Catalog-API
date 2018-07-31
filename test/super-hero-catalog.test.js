@@ -3,21 +3,59 @@
 const app = require('../app'),
 			chai = require('chai'),
 			request = require('supertest')
-			expect = chai.expect
+			expect = chai.expect,
+			io = require('socket.io-client'),
+      socketUrl = 'http://localhost:3000',
+      options = {  
+        transports: ['websocket'],
+  			'force new connection': true
+			}
+
 let token = ""
+let tokenStandard = ""
 
 describe('Super-Hero-Catalog-API tests', function() {
 
 	describe('#Authentication Tests', function() { 
-		describe('#GET / superpowers', function() { 
+		describe('#GET / superpowers without token', function() { 
 			it('should return error Forbidden', function(done) { 
 				request(app)
 					.get('/superpowers')				
 					.end(function(err, res) { 
-						expect(res.statusCode).to.equal(403); 
-						expect(res.body).to.be.an('object'); 
-						expect(res.body.success).to.be.false;
+						expect(res.statusCode).to.equal(403) 
+						expect(res.body).to.be.an('object') 
+						expect(res.body.success).to.be.false
 						expect(res.body.message).to.equal('Forbidden')
+						done()
+					})
+			})
+		})
+
+		describe('#GET / superpowers invalid token', function() { 
+			it('should return error Forbidden', function(done) { 
+				request(app)
+					.get('/superpowers')
+					.set('x-access-token', '1234567890')
+					.end(function(err, res) { 
+						expect(res.statusCode).to.equal(401) 
+						expect(res.body).to.be.an('object') 
+						expect(res.body.success).to.be.false
+						expect(res.body.message).to.equal('Error: Not enough or too many segments')
+						done()
+					})
+			})
+		})
+
+		describe('#GET / superpowers altered token', function() { 
+			it('should return error Forbidden', function(done) { 
+				request(app)
+					.get('/superpowers')
+					.set('x-access-token', 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VybmFtZSI6InVzZXIgMDEiLCJyb2xlIjoiQWRtaW4iLCJleHBpcmVzIjoxNTMzMzA1MzgxNDUwfQ.BeZ9krNdkzjB3DqOXku4xPGqg38wMx6BVV3ptKxcCIk')
+					.end(function(err, res) { 
+						expect(res.statusCode).to.equal(401) 
+						expect(res.body).to.be.an('object') 
+						expect(res.body.success).to.be.false
+						expect(res.body.message).to.equal('Error: Signature verification failed')
 						done()
 					})
 			})
@@ -27,7 +65,8 @@ describe('Super-Hero-Catalog-API tests', function() {
 			it('should return error message', function(done) { 
 				request(app)
 					.post('/users/authenticate')
-					.send({username:'', password: ''}) .end(function(err, res) {
+					.send({username:'', password: ''})
+					.end(function(err, res) {
 						expect(res.statusCode).to.equal(401)
 						expect(res.body.success).to.be.false
 						expect(res.body.message).to.equal('Unauthorized (missing username or password)')
@@ -40,7 +79,8 @@ describe('Super-Hero-Catalog-API tests', function() {
 			it('should return error message', function(done) { 
 				request(app)
 					.post('/users/authenticate')
-					.send({username:'watson', password: 'mistersherlock'}) .end(function(err, res) {
+					.send({username:'watson', password: 'mistersherlock'})
+					.end(function(err, res) {
 						expect(res.statusCode).to.equal(404)
 						expect(res.body.success).to.be.false
 						expect(res.body.message).to.equal('Not Found in database')
@@ -53,7 +93,8 @@ describe('Super-Hero-Catalog-API tests', function() {
 			it('should return error message', function(done) { 
 				request(app)
 					.post('/users/authenticate')
-					.send({username:'alfred', password: 'mistersherlock'}) .end(function(err, res) {
+					.send({username:'alfred', password: 'mistersherlock'})
+					.end(function(err, res) {
 						expect(res.statusCode).to.equal(401)
 						expect(res.body.success).to.be.false
 						expect(res.body.message).to.equal('Invalid Password')
@@ -66,7 +107,8 @@ describe('Super-Hero-Catalog-API tests', function() {
 			it('should return the token', function(done) { 
 				request(app)
 					.post('/users/authenticate')
-					.send({username:'alfred', password: 'misterbruce'}) .end(function(err, res) {
+					.send({username:'alfred', password: 'misterbruce'})
+					.end(function(err, res) {
 						expect(res.statusCode).to.equal(200)
 						expect(res.body.success).to.be.true
 						expect(res.body.message).to.equal('Authentication successful')
@@ -82,10 +124,10 @@ describe('Super-Hero-Catalog-API tests', function() {
 					.get('/superpowers')
 					.set('x-access-token', token)
 					.end(function(err, res) { 
-						expect(res.statusCode).to.equal(200); 
-						expect(res.body).to.be.an('object'); 
-						expect(res.body.success).to.be.true;
-						expect(res.body.message).to.equal('List Successful')
+						expect(res.statusCode).to.equal(200) 
+						expect(res.body).to.be.an('object') 
+						expect(res.body.success).to.be.true
+						expect(res.body.message).to.equal('List successful')
 						expect(res.body.data.list).to.be.an('array')
 						done()
 					})
@@ -93,8 +135,7 @@ describe('Super-Hero-Catalog-API tests', function() {
 		})
 	})
 
-	let user = {username:'test', password:'test', role:'Admin'}
-
+	let user = {username:'test', password:'test', role:'Standard'}
 	describe('#Users Tests', function() { 
 		describe('#POST / users', function() { 
 			it('should return new user data', function(done) { 
@@ -103,16 +144,46 @@ describe('Super-Hero-Catalog-API tests', function() {
 					.set('x-access-token', token)
 					.send(user)
 					.end(function(err, res) { 
-						expect(res.statusCode).to.equal(200); 
-						expect(res.body).to.be.an('object'); 
-						expect(res.body.success).to.be.true;
+						expect(res.statusCode).to.equal(200) 
+						expect(res.body).to.be.an('object')
+						expect(res.body.success).to.be.true
 						expect(res.body.message).to.equal('Create successful')
 						user = res.body.data.users
 						done()
 					})
 			})
 		})
-	
+
+		describe('#Execute Authentication Standard user', function() { 
+			it('should return the token for Standard user', function(done) { 
+				request(app)
+					.post('/users/authenticate')
+					.send({username:'robin', password:'misterbruce'})
+					.end(function(err, res) {
+						expect(res.statusCode).to.equal(200)
+						expect(res.body.success).to.be.true
+						expect(res.body.message).to.equal('Authentication successful')
+            tokenStandard = res.body.data.token                      
+						done()
+					})
+			})
+		})
+
+		describe('#GET / users', function() { 
+			it('should return authorization error', function(done) { 
+				request(app)
+					.get('/users')
+					.set('x-access-token', tokenStandard)
+					.end(function(err, res) { 
+						expect(res.statusCode).to.equal(401)
+						expect(res.body).to.be.an('object') 
+						expect(res.body.success).to.be.false
+						expect(res.body.message).to.equal('Unauthorized (low privilege)')
+						done()
+					})
+			})
+		})
+
 		user.username = 'test changed'
 		describe('#PUT / users', function() { 
 			it('should return success', function(done) { 
@@ -127,7 +198,7 @@ describe('Super-Hero-Catalog-API tests', function() {
 						done()
 					})
 			})
-		})
+		})		
 
 		describe('#DELETE / users', function() { 
 			it('should return success', function(done) { 
@@ -149,10 +220,10 @@ describe('Super-Hero-Catalog-API tests', function() {
 					.get('/users')
 					.set('x-access-token', token)
 					.end(function(err, res) { 
-						expect(res.statusCode).to.equal(200); 
-						expect(res.body).to.be.an('object'); 
-						expect(res.body.success).to.be.true;
-						expect(res.body.message).to.equal('List Successful')
+						expect(res.statusCode).to.equal(200) 
+						expect(res.body).to.be.an('object') 
+						expect(res.body.success).to.be.true
+						expect(res.body.message).to.equal('List successful')
 						expect(res.body.data.list).to.be.an('array')
 						done()
 					})
@@ -160,9 +231,7 @@ describe('Super-Hero-Catalog-API tests', function() {
 		})
 	})
 
-
 	let superpower01 = {name:'super power 01', description:'description super power'}
-
 	describe('#Super Powers Tests', function() { 
 		describe('#POST / superpowers / empty', function() { 
 			it('should return error validation messages', function(done) { 
@@ -171,9 +240,9 @@ describe('Super-Hero-Catalog-API tests', function() {
 					.set('x-access-token', token)
 					.send({name:'', description:''})
 					.end(function(err, res) { 
-						expect(res.statusCode).to.equal(200); 
-						expect(res.body).to.be.an('object'); 
-						expect(res.body.success).to.be.false;
+						expect(res.statusCode).to.equal(200) 
+						expect(res.body).to.be.an('object') 
+						expect(res.body.success).to.be.false
 						expect(res.body.message).to.be.an('array')
 						done()
 					})
@@ -187,9 +256,9 @@ describe('Super-Hero-Catalog-API tests', function() {
 					.set('x-access-token', token)
 					.send(superpower01)
 					.end(function(err, res) { 
-						expect(res.statusCode).to.equal(200); 
-						expect(res.body).to.be.an('object'); 
-						expect(res.body.success).to.be.true;
+						expect(res.statusCode).to.equal(200) 
+						expect(res.body).to.be.an('object') 
+						expect(res.body.success).to.be.true
 						expect(res.body.message).to.equal('Create successful')
 						superpower01 = res.body.data.superpowers
 						done()
@@ -219,10 +288,10 @@ describe('Super-Hero-Catalog-API tests', function() {
 					.get('/superpowers/' + superpower01._id)
 					.set('x-access-token', token)
 					.end(function(err, res) { 
-						expect(res.statusCode).to.equal(200); 
-						expect(res.body).to.be.an('object'); 
-						expect(res.body.success).to.be.true;
-						expect(res.body.message).to.equal('Read Successful')
+						expect(res.statusCode).to.equal(200) 
+						expect(res.body).to.be.an('object') 
+						expect(res.body.success).to.be.true
+						expect(res.body.message).to.equal('Read successful')
 						expect(res.body.data.superpowers._id).to.equal(superpower01._id)
 						done()
 					})
@@ -235,10 +304,10 @@ describe('Super-Hero-Catalog-API tests', function() {
 					.get('/superpowers')
 					.set('x-access-token', token)
 					.end(function(err, res) { 
-						expect(res.statusCode).to.equal(200); 
-						expect(res.body).to.be.an('object'); 
-						expect(res.body.success).to.be.true;
-						expect(res.body.message).to.equal('List Successful')
+						expect(res.statusCode).to.equal(200) 
+						expect(res.body).to.be.an('object') 
+						expect(res.body.success).to.be.true
+						expect(res.body.message).to.equal('List successful')
 						expect(res.body.data.list).to.be.an('array')
 						done()
 					})
@@ -258,7 +327,6 @@ describe('Super-Hero-Catalog-API tests', function() {
 			},
 			superpower:[superpower01._id]
 		}
-		console.log('super hero', superhero)
 
 		describe('#POST / superheroes / no super power', function() { 
 			it('should return error super power required', function(done) { 
@@ -267,9 +335,9 @@ describe('Super-Hero-Catalog-API tests', function() {
 					.set('x-access-token', token)
 					.send({name:'', alias:'', protectionArea:{}, superpower:[]})
 					.end(function(err, res) { 
-						expect(res.statusCode).to.equal(401); 
-						expect(res.body).to.be.an('object'); 
-						expect(res.body.success).to.be.false;
+						expect(res.statusCode).to.equal(401) 
+						expect(res.body).to.be.an('object') 
+						expect(res.body.success).to.be.false
 						expect(res.body.message).to.equal('The Super Hero must have at least one super power')
 						done()
 					})
@@ -281,11 +349,11 @@ describe('Super-Hero-Catalog-API tests', function() {
 				request(app)
 					.post('/superheroes')
 					.set('x-access-token', token)
-					.send({name:'', alias:'', protectionArea:{}, superpower:[superpower._id]})
+					.send({name:'', alias:'', protectionArea:{}, superpower:[superpower01._id]})
 					.end(function(err, res) { 
-						expect(res.statusCode).to.equal(200); 
-						expect(res.body).to.be.an('object'); 
-						expect(res.body.success).to.be.false;
+						expect(res.statusCode).to.equal(200) 
+						expect(res.body).to.be.an('object') 
+						expect(res.body.success).to.be.false
 						expect(res.body.message).to.be.an('array')
 						done()
 					})
@@ -299,9 +367,9 @@ describe('Super-Hero-Catalog-API tests', function() {
 					.set('x-access-token', token)
 					.send(superhero)
 					.end(function(err, res) { 
-						expect(res.statusCode).to.equal(200); 
-						expect(res.body).to.be.an('object'); 
-						expect(res.body.success).to.be.true;
+						expect(res.statusCode).to.equal(200) 
+						expect(res.body).to.be.an('object') 
+						expect(res.body.success).to.be.true
 						expect(res.body.message).to.equal('Create successful')
 						superhero = res.body.data.superheroes
 						done()
@@ -331,10 +399,10 @@ describe('Super-Hero-Catalog-API tests', function() {
 					.get('/superheroes/' + superhero._id)
 					.set('x-access-token', token)
 					.end(function(err, res) { 
-						expect(res.statusCode).to.equal(200); 
-						expect(res.body).to.be.an('object'); 
-						expect(res.body.success).to.be.true;
-						expect(res.body.message).to.equal('Read Successful')
+						expect(res.statusCode).to.equal(200) 
+						expect(res.body).to.be.an('object') 
+						expect(res.body.success).to.be.true
+						expect(res.body.message).to.equal('Read successful')
 						expect(res.body.data.superheroes._id).to.equal(superhero._id)
 						done()
 					})
@@ -361,10 +429,10 @@ describe('Super-Hero-Catalog-API tests', function() {
 					.get('/superheroes')
 					.set('x-access-token', token)
 					.end(function(err, res) { 
-						expect(res.statusCode).to.equal(200); 
-						expect(res.body).to.be.an('object'); 
-						expect(res.body.success).to.be.true;
-						expect(res.body.message).to.equal('List Successful')
+						expect(res.statusCode).to.equal(200) 
+						expect(res.body).to.be.an('object') 
+						expect(res.body.success).to.be.true
+						expect(res.body.message).to.equal('List successful')
 						expect(res.body.data.list).to.be.an('array')
 						done()
 					})
@@ -385,15 +453,51 @@ describe('Super-Hero-Catalog-API tests', function() {
 					})
 			})
 		})
-
-
-
 	})
 
+	describe('#Push Notifications Tests - Socket-io', function() {
+		describe('#Authentication denied', function () {  
+			var client1
+			it('should connect and receive error message', function (done) {  
+				client1 = io.connect(socketUrl, options)
+				client1.on('welcome', function(msg){
+					expect(msg).to.equal('Authorizathion token not sent or invalid.')
+					done()
+				})
+				client1.on('connect', function(){
+					client1.emit('subscribe', "test")
+				})
+			})  
+		})
+		
+		describe('#Authentication token low privilege', function () {  
+			var client2
+			it('should connect and receive error message', function (done) {  
+				client2 = io.connect(socketUrl, options)
+				client2.on('welcome', function(msg){
+					expect(msg).to.equal('Unauthorized (low privilege)')
+					done()
+				})
+		
+				client2.on('connect', function(){
+					client2.emit('subscribe', tokenStandard)
+				})
+			})  
+		})
 
-
-
-
-
-	
+		describe('#Authentication correct', function () {  
+			var client2
+			it('should connect and receive welcome message', function (done) {  
+				client2 = io.connect(socketUrl, options)
+				client2.on('welcome', function(msg){
+					expect(msg).to.equal('Welcome to Super Hero Catalogue Server Notification Socket - all messages will be sent in the audit event.')
+					done()
+				})
+		
+				client2.on('connect', function(){
+					client2.emit('subscribe', token)
+				})
+			})  
+		})
+	})
 })
