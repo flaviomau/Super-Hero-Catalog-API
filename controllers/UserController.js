@@ -3,7 +3,7 @@ const debug     = require('debug')('super-hero-catalog:controller'),
       jwt       = require('jwt-simple'),
       moment    = require('moment'),
       config    = require('config'),
-      bcrypt    = require('bcrypt'),
+      bcrypt    = require('bcryptjs'),
       Util      = require('../utils/util')
 
 const buildUser = (body) => {

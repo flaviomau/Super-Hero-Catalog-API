@@ -15,6 +15,9 @@ const express               = require('express'),
         'PUT'   : 'UPDATE',
         'DELETE': 'DELETE',
         'GET'   : 'LIST'      }
+      PORT                  = 3000,
+      HOST                  = '0.0.0.0'
+
 
 // server config
 app.use(methodOverride('X­HTTP­Method'))
@@ -80,7 +83,7 @@ const server = require('http').createServer(app)
 const io = require('./controllers/socketServer')(server)
 app.set('io', io)
 
-server.listen(3000, () => {
+server.listen(PORT, HOST, () => {
   var host = server.address().address
   var port = server.address().port
   console.log('Super Hero Catalogue Server listening at http://%s:%s', host, port)

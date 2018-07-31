@@ -6,7 +6,7 @@ var mongoose  = require('mongoose'),
 const _connection = () => {
   const username  = config.get('mongo.username'),
         password  = config.get('mongo.password'),
-        server    = config.get('mongo.server'),
+        server    = process.env.DATABASE || config.get('mongo.server'),
         port      = config.get('mongo.port'),
         database  = config.get('mongo.database'),
         auth      = username ? username + ':' + password + '@' : ''
@@ -17,10 +17,12 @@ mongoose.connect(_connection())
 const db = mongoose.connection
 
 db.on('error', error => {
+  console.log('mongo error:', error)
   debug(error)
 })
 
 db.once('open', callback => {
+  console.log('connected to mongodb')
   debug('connected to mongodb')
 })
 
